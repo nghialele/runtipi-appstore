@@ -5,7 +5,7 @@
   "port": 8093,
   "id": "tailscale",
   "tipi_version": 26,
-  "version": "1.64.2",
+  "version": "1.66.2",
   "categories": [
     "network",
     "security"
