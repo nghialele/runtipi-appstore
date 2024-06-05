@@ -4,7 +4,12 @@ Stalwart is a scalable, secure and robust open-source mail server software desig
 
 ### Admin Password
 
-See [Log in to the web interface](https://stalw.art/docs/install/docker#log-in-to-the-web-interface) to know how to get the admin password.
+Execute `docker logs stalwart-mail` to obtain the system the administrator account and password: 
+```
+$ docker logs stalwart-mail
+✅ Configuration file written to /opt/stalwart-mail/etc/config.toml
+🔑 Your administrator account is 'admin' with password 'w95Yuiu36E'.
+```
 
 ### Screenshots
 
