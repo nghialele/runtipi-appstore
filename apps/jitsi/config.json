@@ -1,0 +1,111 @@
+{
+    "$schema": "../schema.json",
+    "name": "Jitsi Meet",
+    "available": true,
+    "exposable": true,
+    "port": 9000,
+    "id": "jitsi",
+    "tipi_version": 13,
+    "version": "stable-9457-2",
+    "categories": [
+      "social"
+    ],
+    "description": "Jitsi is a set of open-source projects that allows you to easily build and deploy secure video conferencing solutions.",
+    "short_desc": "Jitsi: Video Conferencing Software.",
+    "author": "https://github.com/jitsi/",
+    "source": "https://github.com/jitsi/docker-jitsi-meet",
+    "website": "https://jitsi.org",
+    "form_fields": [
+      {
+        "type": "random",
+        "label": "XMPP password for Jicofo client connections",
+        "min": 16,
+        "env_variable": "JICOFO_AUTH_PASSWORD"
+      },
+      {
+        "type": "random",
+        "label": "XMPP password for JVB client connections",
+        "min": 16,
+        "env_variable": "JVB_AUTH_PASSWORD"
+      },
+      {
+        "type": "random",
+        "label": "XMPP password for Jigasi MUC client connections",
+        "min": 16,
+        "env_variable": "JIGASI_XMPP_PASSWORD"
+      },
+      {
+        "type": "random",
+        "label": "XMPP recorder password for Jibri client connections",
+        "min": 16,
+        "env_variable": "JIBRI_RECORDER_PASSWORD"
+      },
+      {
+        "type": "random",
+        "label": "XMPP password for Jibri client connections",
+        "min": 16,
+        "env_variable": "JIBRI_XMPP_PASSWORD"
+      },
+      {
+        "type": "boolean",
+        "label": "Enable Let's Encrypt",
+        "default": true,
+        "env_variable": "ENABLE_LETSENCRYPT"
+      },
+      {
+        "type": "text",
+        "label": "Domain for which to generate the certificate",
+        "default": "meet.example.com",
+        "env_variable": "LETSENCRYPT_DOMAIN"
+      },
+      {
+        "type": "text",
+        "label": "E-Mail for receiving important account notifications",
+        "required": true,
+        "default": "alice@wonderland.fun",
+        "env_variable": "LETSENCRYPT_EMAIL"
+      },
+      {
+        "type": "boolean",
+        "label": "Use the staging server (for avoiding rate limits while testing)",
+        "default": false,
+        "env_variable": "LETSENCRYPT_USE_STAGING"
+      },
+      {
+        "type": "text",
+        "label": "Public URL for the web service (required) - LE domain with https:// prefix",
+        "required": true,
+        "default": "https://meet.example.com",
+        "env_variable": "PUBLIC_URL"
+      },
+      {
+        "type": "text",
+        "label": "System time zone",
+        "default": "UTC",
+        "env_variable": "TZ"
+      },
+      {
+        "type": "text",
+        "label": "Exposed HTTP port",
+        "default": "9000",
+        "env_variable": "HTTP_PORT"
+      },
+      {
+        "type": "text",
+        "label": "Exposed HTTPS port",
+        "default": "9143",
+        "env_variable": "HTTPS_PORT"
+      },
+      {
+        "type": "text",
+        "label": "Directory where all configuration will be stored (leave default if you are unsure)",
+        "required": true,
+        "default": "~/.jitsi-meet-cfg",
+        "env_variable": "CONFIG"
+      }
+    ],
+    "supported_architectures": [
+      "amd64"
+    ]
+  }
+  

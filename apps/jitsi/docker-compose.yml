@@ -1,0 +1,88 @@
+
+networks:
+  meet.jitsi:
+    name: meet.jitsi
+    internal: true
+# Here 'tipi_main_network' is the existing Traefik network.
+# Substitute all mentions with the name of your Traefik network
+  tipi_main_network:
+    name: tipi_main_network
+
+services:
+  jitsi-web:
+    container_name: jitsi-web
+# Change to latest build version as required
+# Ensure all jitsi services are on the same build version
+    image: jitsi/web:stable
+    restart: unless-stopped
+    volumes:
+# ${CONFIG} is a bash alias, add to your system env or replace with directory path.
+      - ${CONFIG}/web:/config:Z
+    environment:
+      - PUBLIC_URL
+      - TZ
+    networks:
+      - meet.jitsi
+      - tipi_main_network
+    labels:
+      - "traefik.enable=true"
+# Here 'https' is the name of the :443 entrypoint as defined in your Traefik config.
+# Substitute if needed.
+      - "traefik.http.routers.jitsi-rtr.entrypoints=websecure"
+# Substitute 'jitsi.example.com' with the domain you will host Jitsi on
+      - "traefik.http.routers.jitsi-rtr.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.jitsi-rtr.tls=true"
+      - "traefik.http.routers.jitsi-rtr.service=jitsi-svc"
+      - "traefik.http.services.jitsi-svc.loadbalancer.server.port=80"
+
+  prosody:
+    container_name: prosody
+    image: jitsi/prosody:stable
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/prosody/config:/config:Z
+    environment:
+      - JICOFO_AUTH_PASSWORD
+      - JVB_AUTH_PASSWORD
+      - PUBLIC_URL
+      - TZ
+    networks:
+      meet.jitsi:
+        aliases:
+          - xmpp.meet.jitsi
+
+  jicofo:
+    container_name: jicofo
+    image: jitsi/jicofo:stable
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/jicofo:/config:Z
+    environment:
+      - JICOFO_AUTH_PASSWORD
+      - TZ
+    depends_on:
+      - prosody
+    networks:
+      - meet.jitsi
+
+  jvb:
+    container_name: jvb
+    image: jitsi/jvb:stable
+    restart: unless-stopped
+    volumes:
+      - ${CONFIG}/jvb:/config:Z
+    environment:
+      - JVB_ADVERTISE_IPS
+      - JVB_AUTH_PASSWORD
+      - PUBLIC_URL
+      - TZ
+    depends_on:
+      - prosody
+    networks:
+      - meet.jitsi
+      - tipi_main_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.udp.routers.jvb-rtr.entrypoints=video"
+      - "traefik.udp.routers.jvb-rtr.service=jvb-svc"
+      - "traefik.udp.services.jvb-svc.loadbalancer.server.port=10000"
