@@ -1,7 +1,8 @@
 version: "3.9"
 
 networks:
-  runtipi_tipi_main_network:
+  tipi_main_network:
+    name: runtipi_tipi_main_network
     external: true
     driver: bridge
     ipam:
