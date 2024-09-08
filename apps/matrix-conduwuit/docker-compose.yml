@@ -1,0 +1,97 @@
+version: "3.7"
+
+services:
+  matrix-conduwuit:
+    container_name: matrix-conduwuit
+    image: girlbossceo/conduwuit:latest
+    environment:
+      CONDUWUIT_SERVER_NAME: ${APP_DOMAIN} # EDIT THIS
+      CONDUWUIT_DATABASE_PATH: /var/lib/conduwuit
+      CONDUWUIT_DATABASE_BACKEND: rocksdb
+      CONDUWUIT_PORT: 6167 # should match the loadbalancer traefik label
+      CONDUWUIT_MAX_REQUEST_SIZE: 20_000_000 # in bytes, ~20 MB
+      CONDUWUIT_ALLOW_REGISTRATION: 'true'
+      CONDUWUIT_ALLOW_FEDERATION: 'true'
+      CONDUWUIT_ALLOW_CHECK_FOR_UPDATES: 'true'
+      CONDUWUIT_TRUSTED_SERVERS: '["matrix.org"]'
+      CONDUWUIT_LOG: ${LOG:-warn,state_res=warn}
+      CONDUWUIT_ADDRESS: 0.0.0.0
+      CONDUWUIT_TURN_URIS: ${TURN_URIS:-["turn:localhost?transport=udp", "turn:localhost?transport=tcp"]}
+      CONDUWUIT_TURN_SECRET: ${TURN_SECRET:-j5r6sa7zyNhGELTmMw8Atb2x4pUfQcHWV}
+      #CONDUWUIT_CONFIG: "" # Ignore this
+      CONDUWUIT_WELL_KNOWN: |
+        {
+        client=${APP_DOMAIN},
+        server=${APP_DOMAIN}:443
+        }
+    ulimits: # conduwuit uses quite a few file descriptors, and on some systems it defaults to 1024, so you can tell docker to increase it
+      nofile:
+        soft: 1048567
+        hard: 1048567
+    restart: unless-stopped
+    volumes:
+      - ${APP_DATA_DIR}/data:/var/lib/conduwuit
+    networks:
+      - tipi_main_network
+    labels:
+      # Main
+      traefik.enable: true
+      traefik.http.middlewares.matrix-conduwuit-web-redirect.redirectscheme.scheme: https
+      traefik.http.services.matrix-conduwuit.loadbalancer.server.port: 6167
+      # Web
+      traefik.http.routers.matrix-conduwuit-insecure.rule: Host(`${APP_DOMAIN}`)
+      traefik.http.routers.matrix-conduwuit-insecure.entrypoints: web
+      traefik.http.routers.matrix-conduwuit-insecure.service: matrix-conduwuit
+      traefik.http.routers.matrix-conduwuit-insecure.middlewares: matrix-conduwuit-web-redirect
+      # Websecure
+      traefik.http.routers.matrix-conduwuit.rule: Host(`${APP_DOMAIN}`)
+      traefik.http.routers.matrix-conduwuit.entrypoints: websecure
+      traefik.http.routers.matrix-conduwuit.service: matrix-conduwuit
+      traefik.http.routers.matrix-conduwuit.tls.certresolver: myresolver
+      # Local domain
+      traefik.http.routers.matrix-conduwuit-local-insecure.rule: Host(`matrix-conduwuit.${LOCAL_DOMAIN}`)
+      traefik.http.routers.matrix-conduwuit-local-insecure.entrypoints: web
+      traefik.http.routers.matrix-conduwuit-local-insecure.service: matrix-conduwuit
+      traefik.http.routers.matrix-conduwuit-local-insecure.middlewares: matrix-conduwuit-web-redirect
+      # Local domain secure
+      traefik.http.routers.matrix-conduwuit-local.rule: Host(`matrix-conduwuit.${LOCAL_DOMAIN}`)
+      traefik.http.routers.matrix-conduwuit-local.entrypoints: websecure
+      traefik.http.routers.matrix-conduwuit-local.service: matrix-conduwuit
+      traefik.http.routers.matrix-conduwuit-local.tls: true
+      runtipi.managed: true
+  matrix-conduwuit-well-known:
+    container_name: matrix-conduwuit-well-known
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+    restart: unless-stopped
+    networks:
+      - tipi_main_network
+    labels:
+      # Main
+      traefik.enable: true
+      traefik.http.middlewares.matrix-well-knows-web-redirect.redirectscheme.scheme: https
+      traefik.http.services.matrix-well-knows.loadbalancer.server.port: 80
+      # Web
+      traefik.http.routers.matrix-well-knows-insecure.rule: Host(`${APP_DOMAIN}`) && PathPrefix(`/.well-known/matrix`)
+      traefik.http.routers.matrix-well-knows-insecure.entrypoints: web
+      traefik.http.routers.matrix-well-knows-insecure.service: matrix-well-knows
+      traefik.http.routers.matrix-well-knows-insecure.middlewares: matrix-well-knows-web-redirect
+      # Websecure
+      traefik.http.routers.matrix-well-knows.rule: Host(`${APP_DOMAIN}`) && PathPrefix(`/.well-known/matrix`)
+      traefik.http.routers.matrix-well-knows.entrypoints: websecure
+      traefik.http.routers.matrix-well-knows.service: matrix-well-knows
+      traefik.http.routers.matrix-well-knows.tls.certresolver: myresolver
+      # Local domain
+      traefik.http.routers.matrix-well-knows-local-insecure.rule: Host(`matrix-well-knows.${LOCAL_DOMAIN}`) && PathPrefix(`/.well-known/matrix`)
+      traefik.http.routers.matrix-well-knows-local-insecure.entrypoints: web
+      traefik.http.routers.matrix-well-knows-local-insecure.service: matrix-well-knows
+      traefik.http.routers.matrix-well-knows-local-insecure.middlewares: matrix-well-knows-web-redirect
+      # Local domain secure
+      traefik.http.routers.matrix-well-knows-local.rule: Host(`matrix-well-knows.${LOCAL_DOMAIN}`) && PathPrefix(`/.well-known/matrix`)
+      traefik.http.routers.matrix-well-knows-local.entrypoints: websecure
+      traefik.http.routers.matrix-well-knows-local.service: matrix-well-knows
+      traefik.http.routers.matrix-well-knows-local.tls: true
+      runtipi.managed: true
