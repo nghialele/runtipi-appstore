@@ -1,6 +1,6 @@
 {
   "$schema": "../schema.json",
-  "name": "conduwuit",
+  "name": "Matrix Conduwuit",
   "port": 6167,
   "available": true,
   "exposable": true,
