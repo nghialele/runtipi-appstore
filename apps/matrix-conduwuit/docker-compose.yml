@@ -21,7 +21,7 @@ services:
       #CONDUWUIT_CONFIG: "" # Ignore this
       CONDUWUIT_WELL_KNOWN: |
         {
-        client=${APP_DOMAIN},
+        client=https://${APP_DOMAIN},
         server=${APP_DOMAIN}:443
         }
     ulimits: # conduwuit uses quite a few file descriptors, and on some systems it defaults to 1024, so you can tell docker to increase it
