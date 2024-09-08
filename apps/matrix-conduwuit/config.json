@@ -8,7 +8,7 @@
   "no_gui": true,
   "id": "matrix-conduwuit",
   "tipi_version": 7,
-  "version": "0.4.6",
+  "version": "latest",
   "categories": ["social"],
   "description": "Conduit is a fast Matrix homeserver that’s easy to set up and just works. You can install it on a mini-computer like the Raspberry Pi to host Matrix for your family, friends or company.",
   "short_desc": "a very cool, featureful fork of Conduit which is a simple, fast and reliable chat server written in Rust",
