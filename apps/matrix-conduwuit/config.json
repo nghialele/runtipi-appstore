@@ -24,6 +24,13 @@
       "env_variable": "CONDUWUIT_ALLOW_REGISTRATION"
     },
     {
+      "type": "text",
+      "label": "Registration Token",
+      "hint": "User will need to provide this token to register on the server. Required if Allow Registration is true.",
+      "required": false,
+      "env_variable": "CONDUWUIT_REGISTRATION_TOKEN"
+    },
+    {
       "type": "boolean",
       "label": "Allow Federation",
       "required": false,
