@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   matrix-conduwuit:
     container_name: matrix-conduwuit
@@ -18,6 +16,7 @@ services:
       CONDUWUIT_ADDRESS: 0.0.0.0
       CONDUWUIT_TURN_URIS: ${TURN_URIS:-["turn:localhost?transport=udp", "turn:localhost?transport=tcp"]}
       CONDUWUIT_TURN_SECRET: ${TURN_SECRET:-j5r6sa7zyNhGELTmMw8Atb2x4pUfQcHWV}
+      CONDUWUIT_REGISTRATION_TOKEN: ${CONDUWUIT_REGISTRATION_TOKEN:-LTmMw8Atb2Qc6ssaELTmMw87zyNhGELTmMw8Atb2xx46hGELssa7zyx4pUfQczyNhGELTb2xaTyNhG}
       #CONDUWUIT_CONFIG: "" # Ignore this
       CONDUWUIT_WELL_KNOWN: |
         {
